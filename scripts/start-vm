@@ -1,0 +1,13 @@
+#!/bin/bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT_DIR=$(dirname ${SCRIPT_DIR})
+
+if [ "$(uname)" != "Linux" ]; then
+    echo "Please run this under linux"
+    exit 1
+fi
+
+(qemu-system-x86_64 --bios OVMF.fd -hda ${ROOT_DIR}/hdimage.bin -vnc 0.0.0.0:59 &> /dev/null &)
+
+echo "Started vm with vnc on 0.0.0.0:59"

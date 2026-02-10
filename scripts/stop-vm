@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ "$(uname)" != "Linux" ]; then
+    echo "Please run this under linux"
+    exit 1
+fi
+
+PID="$(pgrep qemu-system-x86)"
+
+if [ "$?" -ne 0 ]; then
+    echo "Failed to find PID of vm"
+    exit 1
+fi
+
+kill -INT $PID
+
+echo "Stopped vm"
