@@ -1,5 +1,13 @@
+<<<<<<< Updated upstream:src/kernel.c
 #include "font.h"
 #include <limine.h>
+=======
+// #include "../cpu/isr.h"
+// #include "../drivers/keyboard.h"
+#include "console.h"
+#include "limine.h"
+#include "util.h"
+>>>>>>> Stashed changes:src/kernel/kernel.c
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -22,6 +30,18 @@ __attribute__((
         ".limine_requests"))) static volatile struct limine_framebuffer_request
     framebuffer_request = {.id = LIMINE_FRAMEBUFFER_REQUEST_ID, .revision = 0};
 
+<<<<<<< Updated upstream:src/kernel.c
+=======
+// __attribute__((
+//     used, section(".limine_requests"))) static volatile struct limine_mp_request
+//     mp_request = {.id = LIMINE_MP_REQUEST_ID, .revision = 0};
+
+// __attribute__((
+//     used,
+//     section(".limine_requests"))) static volatile struct limine_hhdm_request
+//     hhdm_request = {.id = LIMINE_HHDM_REQUEST_ID, .revision = 0};
+
+>>>>>>> Stashed changes:src/kernel/kernel.c
 // Finally, define the start and end markers for the Limine requests.
 // These can also be moved anywhere, to any .c file, as seen fit.
 
@@ -96,6 +116,11 @@ static void hcf(void) {
   }
 }
 
+<<<<<<< Updated upstream:src/kernel.c
+=======
+// uint64_t hhdm_offset;
+
+>>>>>>> Stashed changes:src/kernel/kernel.c
 // The following will be our kernel's entry point.
 // If renaming kmain() to something else, make sure to change the
 // linker script accordingly.
@@ -105,16 +130,36 @@ void kmain(void) {
     hcf();
   }
 
+<<<<<<< Updated upstream:src/kernel.c
   // Ensure we got a framebuffer.
+=======
+  // Ensure we got APIC
+  // if (mp_request.response == NULL || mp_request.response->cpu_count < 1) {
+  //   hcf();
+  // }
+
+  // Ensure we got a framebuxffer.
+>>>>>>> Stashed changes:src/kernel/kernel.c
   if (framebuffer_request.response == NULL ||
       framebuffer_request.response->framebuffer_count < 1) {
     hcf();
   }
 
+<<<<<<< Updated upstream:src/kernel.c
+=======
+  // Ensure we got HHDM
+  // if (hhdm_request.response == NULL) {
+  //   hcf();
+  // }
+
+  // hhdm_offset = hhdm_request.response->offset;
+
+>>>>>>> Stashed changes:src/kernel/kernel.c
   // Fetch the first framebuffer.
   struct limine_framebuffer *framebuffer =
       framebuffer_request.response->framebuffers[0];
 
+<<<<<<< Updated upstream:src/kernel.c
   char_parameters params;
   params.fg = 0xFFFFFF;
   params.bg = 0;
@@ -122,6 +167,29 @@ void kmain(void) {
   params.y = 200;
   // putchar(framebuffer, params, 'H');
   puttext(framebuffer, params, "Hello, World!\nGoodbye, World!");
+=======
+  console_init(framebuffer);
+  // Console.init(framebuffer);
+
+  // term_clear();
+  // Console.clear();
+
+  // isr_install();
+
+  // lapic_init_x2apic();
+
+  // ioapic_init(hhdm_offset);
+
+  // ioapic_set_redirect(mp_request.response->bsp_lapic_id, 1,
+  //                     33); // keyboard → IRQ1 → vector 33
+
+  // asm volatile("sti");
+
+  // init_keyboard();
+
+  term_puts("Hello, World!\nGoodbye, World!");
+  // Console.puts("Hello, World!\nGoodbye, World!");
+>>>>>>> Stashed changes:src/kernel/kernel.c
 
   // We're done, just hang...
   hcf();
