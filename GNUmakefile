@@ -99,7 +99,15 @@ override LDFLAGS += \
 
 # Use "find" to glob all *.c, *.S, and *.asm files in the tree and obtain the
 # object and header dependency file names.
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 override SRCFILES := $(shell find -L fonts src -type f 2>/dev/null | LC_ALL=C sort)
+=======
+override SRCFILES := $(shell find -L fonts src/kernel -type f 2>/dev/null | LC_ALL=C sort)
+>>>>>>> Stashed changes
+=======
+override SRCFILES := $(shell find -L fonts src/kernel -type f 2>/dev/null | LC_ALL=C sort)
+>>>>>>> Stashed changes
 override CFILES := $(filter %.c,$(SRCFILES))
 override ASFILES := $(filter %.S,$(SRCFILES))
 override NASMFILES := $(filter %.asm,$(SRCFILES))
