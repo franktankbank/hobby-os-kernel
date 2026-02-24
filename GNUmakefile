@@ -99,21 +99,12 @@ override LDFLAGS += \
 
 # Use "find" to glob all *.c, *.S, and *.asm files in the tree and obtain the
 # object and header dependency file names.
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-override SRCFILES := $(shell find -L fonts src -type f 2>/dev/null | LC_ALL=C sort)
-=======
 override SRCFILES := $(shell find -L fonts src/kernel -type f 2>/dev/null | LC_ALL=C sort)
->>>>>>> Stashed changes
-=======
-override SRCFILES := $(shell find -L fonts src/kernel -type f 2>/dev/null | LC_ALL=C sort)
->>>>>>> Stashed changes
 override CFILES := $(filter %.c,$(SRCFILES))
-override ASFILES := $(filter %.S,$(SRCFILES))
 override NASMFILES := $(filter %.asm,$(SRCFILES))
 override FONTFILES := $(filter %.sfn,$(SRCFILES))
-override OBJ := $(addprefix obj/,$(CFILES:.c=.c.o) $(ASFILES:.S=.S.o) $(NASMFILES:.asm=.asm.o) $(FONTFILES:.sfn=.sfn.o))
-override HEADER_DEPS := $(addprefix obj/,$(CFILES:.c=.c.d) $(ASFILES:.S=.S.d))
+override OBJ := $(addprefix obj/,$(CFILES:.c=.c.o) $(NASMFILES:.asm=.asm.o) $(FONTFILES:.sfn=.sfn.o))
+override HEADER_DEPS := $(addprefix obj/,$(CFILES:.c=.c.d))
 
 # Default target. This must come first, before header dependencies.
 .PHONY: all

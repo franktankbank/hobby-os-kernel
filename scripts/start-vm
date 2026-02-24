@@ -8,6 +8,6 @@ if [ "$(uname)" != "Linux" ]; then
     exit 1
 fi
 
-(qemu-system-x86_64 --bios OVMF.fd -hda ${ROOT_DIR}/hdimage.bin -vnc 0.0.0.0:59 &> /dev/null &)
+(qemu-system-x86_64 --bios OVMF.fd -hda ${ROOT_DIR}/image.hdd -vnc 0.0.0.0:59 -cpu Skylake-Client,+x2apic &> /dev/null &)
 
 echo "Started vm with vnc on 0.0.0.0:59"
