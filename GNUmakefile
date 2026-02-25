@@ -99,7 +99,7 @@ override LDFLAGS += \
 
 # Use "find" to glob all *.c, *.S, and *.asm files in the tree and obtain the
 # object and header dependency file names.
-override SRCFILES := $(shell find -L fonts src/kernel -type f 2>/dev/null | LC_ALL=C sort)
+override SRCFILES := $(shell find -L fonts src/kernel src/cpu src/drivers -type f 2>/dev/null | LC_ALL=C sort)
 override CFILES := $(filter %.c,$(SRCFILES))
 override NASMFILES := $(filter %.asm,$(SRCFILES))
 override FONTFILES := $(filter %.sfn,$(SRCFILES))

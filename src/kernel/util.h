@@ -4,9 +4,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define low_16(address) (uint16_t)((address) & 0xFFFF)
-#define high_16(address) (uint16_t)(((address) >> 16) & 0xFFFF)
-
 // GCC and Clang reserve the right to generate calls to the following
 // 4 functions even if they are not directly called.
 // Implement them as the C specification mandates.
@@ -30,3 +27,5 @@ void int_to_string(int n, char str[]);
 void append(char s[], char n);
 
 bool backspace(char s[]);
+
+void hcf(void);
