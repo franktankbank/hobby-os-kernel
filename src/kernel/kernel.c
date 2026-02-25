@@ -1,4 +1,5 @@
-// #include "../cpu/isr.h"
+#include "../cpu/isr.h"
+#include "../cpu/gdt.h"
 // #include "../drivers/keyboard.h"
 #include "console.h"
 #include "limine.h"
@@ -42,13 +43,6 @@ __attribute__((used,
 __attribute__((used, section(".limine_requests_end"))) static volatile uint64_t
     limine_requests_end_marker[] = LIMINE_REQUESTS_END_MARKER;
 
-// Halt and catch fire function.
-static void hcf(void) {
-  for (;;) {
-    asm("hlt");
-  }
-}
-
 // uint64_t hhdm_offset;
 
 // The following will be our kernel's entry point.
@@ -85,10 +79,12 @@ void kmain(void) {
   console_init(framebuffer);
   // Console.init(framebuffer);
 
-  // term_clear();
+  term_clear();
   // Console.clear();
 
-  // isr_install();
+  gdt_install();
+
+  isr_install();
 
   // lapic_init_x2apic();
 
@@ -103,6 +99,8 @@ void kmain(void) {
 
   term_puts("Hello, World!\nGoodbye, World!");
   // Console.puts("Hello, World!\nGoodbye, World!");
+
+  __asm__ volatile("int3");
 
   // We're done, just hang...
   hcf();

@@ -47,7 +47,8 @@ void term_putc(uint32_t ch) {
   }
 
   ssfn_dst.x = cursor.col * cell_w;
-  ssfn_dst.y = (cursor.row + 1) * cell_h;
+  // ssfn_dst.y = (cursor.row + 1) * cell_h;
+  ssfn_dst.y = cursor.row * cell_h;
 
   ssfn_putc(ch);
 
@@ -65,7 +66,7 @@ void term_putc(uint32_t ch) {
 
 // void clear(void) {
 void term_clear(void) {
-  uint32_t *fb = (uint32_t *)ssfn_dst.ptr;
+  // uint32_t *fb = (uint32_t *)ssfn_dst.ptr;
 
   for (uint32_t y = 0; y < ssfn_dst.h; y++) {
     uint32_t *row = (uint32_t *)((uint8_t *)ssfn_dst.ptr + y * ssfn_dst.p);
