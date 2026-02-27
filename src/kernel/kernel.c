@@ -1,4 +1,5 @@
 #include "../cpu/isr.h"
+#include "../cpu/idt.h"
 #include "../cpu/gdt.h"
 // #include "../drivers/keyboard.h"
 #include "console.h"
@@ -76,13 +77,13 @@ void kmain(void) {
   struct limine_framebuffer *framebuffer =
       framebuffer_request.response->framebuffers[0];
 
-  console_init(framebuffer);
-  // Console.init(framebuffer);
+  Console.init(framebuffer);
 
-  term_clear();
-  // Console.clear();
+  Console.clear();
 
   gdt_install();
+
+  load_idt();
 
   isr_install();
 
@@ -97,8 +98,7 @@ void kmain(void) {
 
   // init_keyboard();
 
-  term_puts("Hello, World!\nGoodbye, World!");
-  // Console.puts("Hello, World!\nGoodbye, World!");
+  Console.puts("Hello, World!\nGoodbye, World!");
 
   __asm__ volatile("int3");
 

@@ -1,74 +1,39 @@
 #include "gdt.h"
 
-extern void reloadSegments();
+extern void _load_gdt(gdt_pointer_t *descriptor);
+extern void _reload_segments(uint64_t cs, uint64_t ds);
 
-void encodeGdtEntry(uint8_t *target, struct gdt source) {
-    // Encode the limit
-    target[0] = source.limit & 0xFF;
-    target[1] = (source.limit >> 8) & 0xFF;
-    target[6] = (source.limit >> 16) & 0x0F;
+gdt_pointer_t gdtr;
+struct {
+    gdt_entry_t gdt_entries[5];
+    tss_entry_t tss_entry;
+} __attribute__((packed)) gdt;
+tss_t tss = {0};
 
-    // Encode the base
-    target[2] = source.base & 0xFF;
-    target[3] = (source.base >> 8) & 0xFF;
-    target[4] = (source.base >> 16) & 0xFF;
-    target[7] = (source.base >> 24) & 0xFF;
-
-    // Encode the access byte
-    target[5] = source.access_byte;
-
-    // Encode the flags
-    target[6] |= (source.flags << 4);
-}
+#define KERNEL_STACK_SIZE 4096 * 8
+char kernel_stack[KERNEL_STACK_SIZE];
 
 void gdt_install() {
-    uint8_t gdt[8*5]; // or more, depending on how many entries
+    gdt.gdt_entries[0] = (gdt_entry_t)GDT_ENTRY(0, 0, 0, 0); // null seg
+    gdt.gdt_entries[1] = (gdt_entry_t)GDT_ENTRY(0, 0xFFFFF, 0x9A, 0xA); // kernel code seg
+    gdt.gdt_entries[2] = (gdt_entry_t)GDT_ENTRY(0, 0xFFFFF, 0x92, 0xC); // kernel data seg
+    gdt.gdt_entries[3] = (gdt_entry_t)GDT_ENTRY(0, 0xFFFFF, 0xFA, 0xA); // user code seg
+    gdt.gdt_entries[4] = (gdt_entry_t)GDT_ENTRY(0, 0xFFFFF, 0xF2, 0xC); // user data seg
 
-    struct gdt gdt_null = {
-        .base = 0,
-        .limit = 0x00000000,
-        .access_byte = 0x00,
-        .flags = 0x0
-    };
-    struct gdt gdt_c0 = {
-        .base = 0,
-        .limit = 0xFFFFF,
-        .access_byte = 0x9A,
-        .flags = 0xA
-    };
-    struct gdt gdt_d0 = {
-        .base = 0,
-        .limit = 0xFFFFF,
-        .access_byte = 0x92,
-        .flags = 0xC
-    };
-    struct gdt gdt_d3 = {
-        .base = 0,
-        .limit = 0xFFFFF,
-        .access_byte = 0xF2,
-        .flags = 0xC
-    };
-    struct gdt gdt_c3 = {
-        .base = 0,
-        .limit = 0xFFFFF,
-        .access_byte = 0xFA,
-        .flags = 0xA
-    };
-    __asm__ volatile("cli");
-    encodeGdtEntry(&gdt[0*8], gdt_null);
-    encodeGdtEntry(&gdt[1*8], gdt_c0);
-    encodeGdtEntry(&gdt[2*8], gdt_d0);
-    encodeGdtEntry(&gdt[3*8], gdt_d3);
-    encodeGdtEntry(&gdt[4*8], gdt_c3);
+    gdtr.size    = (uint16_t)(sizeof(gdt) - 1);
+    gdtr.pointer = (gdt_entry_t *)&gdt;
 
-    struct gdt_ptr {
-        uint16_t limit;
-        uint64_t base;
-    } __attribute__((packed)) gdtr;
+    tss.rsp0 = (uint64_t)(kernel_stack + KERNEL_STACK_SIZE);
 
-    gdtr.base = (uint64_t) &gdt;
-    gdtr.limit = sizeof(gdt) - 1;
+    gdt.tss_entry.limit_low   = sizeof(tss_t);
+    gdt.tss_entry.base_low    = (uint16_t)((uint64_t)&tss & 0xffff);
+    gdt.tss_entry.base_middle = (uint8_t)(((uint64_t)&tss >> 16) & 0xff);
+    gdt.tss_entry.access      = 0x89;
+    gdt.tss_entry.limit_high_and_flags = 0;
+    gdt.tss_entry.base_high   = (uint8_t)(((uint64_t)&tss >> 24) & 0xff);
+    gdt.tss_entry.base_higher = (uint32_t)((uint64_t)&tss >> 32);
+    gdt.tss_entry.zero        = 0;
 
-    asm volatile("lgdt %0" : : "m" (gdtr));
-    reloadSegments();
+    _load_gdt(&gdtr);
+    _reload_segments(GDT_KERNEL_CODE, GDT_KERNEL_DATA);
 }
