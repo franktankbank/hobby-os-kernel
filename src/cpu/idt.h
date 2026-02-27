@@ -1,30 +1,30 @@
 #pragma once
 
+#define IDT_MAX_DESCRIPTORS 256
+
 #include <stdint.h>
 
-/* Segment selectors */
-#define KERNEL_CS 0x08
+extern void *isr_stub_table[];
 
-/* How every interrupt gate (handler) is defined */
-typedef struct {
-    uint16_t offset_low;
-    uint16_t selector;
-    uint8_t  ist;        // bits 0..2 = IST, rest must be zero
-    uint8_t  type_attr;
-    uint16_t offset_mid;
-    uint32_t offset_high;
-    uint32_t zero;
-} __attribute__((packed)) idt_gate_t;
+typedef enum {
+    IDT_FLAG_GATE_TASK       = 0x5,
+    IDT_FLAG_GATE_16BIT_INT  = 0x6,
+    IDT_FLAG_GATE_16BIT_TRAP = 0x7,
+    IDT_FLAG_GATE_32BIT_INT  = 0xE,
+    IDT_FLAG_GATE_32BIT_TRAP = 0xF,
 
-extern idt_gate_t idt[256];
+    IDT_FLAG_RING0 = (0 << 5),
+    IDT_FLAG_RING1 = (1 << 5),
+    IDT_FLAG_RING2 = (2 << 5),
+    IDT_FLAG_RING3 = (3 << 5),
 
-/* A pointer to the array of interrupt handlers.
-     * Assembly instruction 'lidt' will read it */
-typedef struct {
-    uint16_t limit;
-    uint64_t base;
-} __attribute__((packed)) idt_register_t;
+    IDT_FLAG_PRESENT = 0x80,
 
-void set_idt_gate(int n, uintptr_t handler);
+} IDT_FLAGS;
+
+void set_idt_gate(uint8_t index, void *base, uint16_t selector, uint8_t flags);
+
+void idt_gate_enable(int interrupt);
+void idt_gate_disable(int interrupt);
 
 void load_idt();

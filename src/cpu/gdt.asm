@@ -1,21 +1,30 @@
 bits 64
+section .text align=16
 
-global reloadSegments
+; void _load_gdt(gdt_pointer_t* descriptor)
+global _load_gdt
+_load_gdt:
+    lgdt [rdi]
+    push ax
+    mov ax, 0x28
+    ltr ax
+    pop ax
+    ret
 
-reloadSegments:
-    ; Reload CS register:
-    push qword .reload_CS ; RIP
-    push qword 0x08 ; CS selector
-    ; push 0x08 ; Push code segment to stack, 0x08 is a stand-in for your code segment
-    ; lea rax, [rel .reload_CS] ; Load address of .reload_CS into RAX
-    ; push rax ; Push this value to the stack
-    retfq  ; Perform a far return, RETFQ or LRETQ depending on syntax
-.reload_CS:
-    ; Reload data segment registers
-    mov   ax, 0x10 ; 0x10 is a stand-in for your data segment
-    mov   ds, ax
-    mov   es, ax
-    mov   fs, ax
-    mov   gs, ax
-    mov   ss, ax
+; void _reload_segments(uint64_t cs, uint64_t ds)
+global _reload_segments
+_reload_segments:
+    push rdi        ; cs (rdi & 0xFF)
+
+    lea rax, [.reload_cs]
+    push rax
+
+    retfq
+.reload_cs:
+    mov ax, si      ; ds
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
     ret
