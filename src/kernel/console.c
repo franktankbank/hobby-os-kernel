@@ -31,12 +31,13 @@ static int term_rows;
 static int cell_w; // Depends on font size, so it will be set later
 static int cell_h; // Depends on font size, so it will be set later
 
-void console_init(struct limine_framebuffer *fb) {
+void console_init() {
+
   ssfn_src = Fonts.font24.normal;
-  ssfn_dst.ptr = fb->address;
-  ssfn_dst.w = fb->width;
-  ssfn_dst.h = fb->height;
-  ssfn_dst.p = fb->pitch;
+  ssfn_dst.ptr = limine_parsed_data.framebuffer->address;
+  ssfn_dst.w = limine_parsed_data.framebuffer->width;
+  ssfn_dst.h = limine_parsed_data.framebuffer->height;
+  ssfn_dst.p = limine_parsed_data.framebuffer->pitch;
   ssfn_dst.fg = 0xFFFFFF;
   ssfn_dst.bg = 0;
   ssfn_dst.x = 0;
@@ -45,8 +46,8 @@ void console_init(struct limine_framebuffer *fb) {
   cell_w = Fonts.font24.width; // Default
   cell_h = Fonts.font24.size; // Default
 
-  term_cols = fb->width / cell_w;
-  term_rows = fb->height / cell_h;
+  term_cols = limine_parsed_data.framebuffer->width / cell_w;
+  term_rows = limine_parsed_data.framebuffer->height / cell_h;
 }
 
 void term_putc(uint32_t ch) {

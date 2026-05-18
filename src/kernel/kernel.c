@@ -1,6 +1,7 @@
-#include "../cpu/isr.h"
-#include "../cpu/idt.h"
-#include "../cpu/gdt.h"
+#include "../cpu/isr/isr.h"
+#include "../cpu/idt/idt.h"
+#include "../cpu/gdt/gdt.h"
+#include "kernel.h"
 // #include "../drivers/keyboard.h"
 #include "console.h"
 #include "limine.h"
@@ -46,6 +47,12 @@ __attribute__((used, section(".limine_requests_end"))) static volatile uint64_t
 
 // uint64_t hhdm_offset;
 
+struct bootloader_data limine_parsed_data;
+
+struct bootloader_data *get_bootloader_data() {
+    return &limine_parsed_data;
+}
+
 // The following will be our kernel's entry point.
 // If renaming kmain() to something else, make sure to change the
 // linker script accordingly.
@@ -77,7 +84,9 @@ void kmain(void) {
   struct limine_framebuffer *framebuffer =
       framebuffer_request.response->framebuffers[0];
 
-  Console.init(framebuffer);
+  limine_parsed_data.framebuffer = framebuffer;
+
+  Console.init();
 
   Console.clear();
 

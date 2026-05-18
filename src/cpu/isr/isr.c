@@ -1,9 +1,7 @@
 #include "isr.h"
-#include "../kernel/console.h"
-#include "../kernel/util.h"
-
-#include "isr.h"
-#include "idt.h"
+#include "../../kernel/console.h"
+#include "../../kernel/util.h"
+#include "../idt/idt.h"
 
 extern struct limine_hhdm_request *hhdm_request;
 
