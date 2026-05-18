@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-if [ "$(uname)" != "Linux" ]; then
-    echo "Please run this under linux"
-    exit 1
-fi
-
-/usr/share/novnc/utils/novnc_proxy --vnc localhost:5959 --listen localhost:6081

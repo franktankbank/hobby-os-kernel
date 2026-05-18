@@ -1,7 +1,7 @@
 #include "idt.h"
 #include <stdbool.h>
-#include "gdt.h"
-#include "../kernel/macro.h"
+#include "../gdt/gdt.h"
+#include "../../kernel/macro.h"
 
 typedef struct {
     uint16_t base_low;  // The lower 16 bits of the ISR's address

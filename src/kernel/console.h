@@ -1,8 +1,11 @@
 #pragma once
 
 #include "limine.h"
+#include "kernel.h"
 #include <stdint.h>
 #include <stdbool.h>
+
+extern struct bootloader_data limine_parsed_data;
 
 struct _console_config {
     void (*set_font)(uint8_t, bool);
@@ -24,7 +27,7 @@ struct _console {
     // void term_putc(const char *s)
     void (*puts)(const char*);
     // void console_init(struct limine_framebuffer *fb)
-    void (*init)(struct limine_framebuffer*);
+    void (*init)();
     // void term_puthex(uint64_t value)
     void (*puthex)(uint64_t);
     // int term_printf(const char *fmt, ...)
