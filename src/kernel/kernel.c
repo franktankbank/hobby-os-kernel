@@ -3,6 +3,7 @@
 #include "../cpu/gdt/gdt.h"
 #include "kernel.h"
 // #include "../drivers/keyboard.h"
+#include "../drivers/serial.h"
 #include "console.h"
 #include "limine.h"
 #include "util.h"
@@ -95,6 +96,8 @@ void kmain(void) {
   load_idt();
 
   isr_install();
+
+  serial_init();
 
   // lapic_init_x2apic();
 

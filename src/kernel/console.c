@@ -16,6 +16,8 @@
 #include "va_list.h"
 #include "nanoprintf.h"
 #include "font.h"
+#include "../drivers/serial.h"
+#include "globals.h"
 
 static struct {
   int row;
@@ -74,11 +76,19 @@ void term_putc(uint32_t ch) {
   }
 }
 
+void serial_putc(char ch) {
+  if (ch == '\n') {
+    write_serial('\r');
+  }
+
+  write_serial(ch);
+}
+
 void term_clear(void) {
-  for (uint32_t y = 0; y < ssfn_dst.h; y++) {
+  for (uint32_t y = 0; y < (uint32_t)ssfn_dst.h; y++) {
     uint32_t *row = (uint32_t *)((uint8_t *)ssfn_dst.ptr + y * ssfn_dst.p);
 
-    for (uint32_t x = 0; x < ssfn_dst.w; x++) {
+    for (uint32_t x = 0; x < (uint32_t)ssfn_dst.w; x++) {
       row[x] = ssfn_dst.bg;
     }
   }
@@ -90,6 +100,13 @@ void term_clear(void) {
 void term_puts(const char *s) {
   while (*s) {
     term_putc((unsigned char)*s);
+    s++;
+  }
+}
+
+void serial_puts(const char *s) {
+  while (*s) {
+    serial_putc(*s);
     s++;
   }
 }
@@ -106,6 +123,20 @@ void term_puthex(uint64_t value) {
 
   term_puts("0x");
   term_puts(buffer);
+}
+
+void serial_puthex(uint64_t value) {
+  char hex[] = "0123456789ABCDEF";
+  char buffer[17];
+  buffer[16] = '\0';
+
+  for (int i = 15; i >= 0; i--) {
+    buffer[i] = hex[value & 0xF];
+    value >>= 4;
+  }
+
+  serial_puts("0x");
+  serial_puts(buffer);
 }
 
 void term_centered_puts(const char *s) {
@@ -156,6 +187,22 @@ int term_printf(const char *fmt, ...) {
   }
 
   term_puts(buffer);
+
+  return length;
+}
+
+int serial_printf(const char *fmt, ...) {
+  char buffer[1024];
+  va_list args;
+
+  va_start(args, fmt);
+  int length = npf_vsnprintf(buffer, sizeof(buffer), fmt, args);
+
+  if (length < 0 || length >= (int)sizeof(buffer)) {
+    return -1;
+  }
+
+  serial_puts(buffer);
 
   return length;
 }
@@ -355,4 +402,11 @@ const struct _console Console = {
   .cursor.get_cols = cursor_get_cols,
   .cursor.get_rows = cursor_get_rows,
   .centered_printf = term_centered_printf
+};
+
+const struct _serial_console SerialConsole = {
+  .putc = serial_putc,
+  .puts = serial_puts,
+  .puthex = serial_puthex,
+  .printf = serial_printf
 };
