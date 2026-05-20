@@ -83,6 +83,7 @@ override CFLAGS += \
 
 # Internal C preprocessor flags that should not be changed by the user.
 override CPPFLAGS := \
+	-I uACPI/include \
 	-I src \
 	$(CPPFLAGS) \
 	-MMD \
@@ -105,7 +106,7 @@ override LDFLAGS += \
 
 # Use "find" to glob all *.c, *.S, and *.asm files in the tree and obtain the
 # object and header dependency file names.
-override SRCFILES := $(shell find -L fonts src/kernel src/cpu/gdt src/cpu/idt src/cpu/isr src/drivers -type f 2>/dev/null | LC_ALL=C sort)
+override SRCFILES := $(shell find -L fonts src/kernel src/cpu/gdt src/cpu/idt src/cpu/isr src/drivers uACPI/source -type f 2>/dev/null | LC_ALL=C sort)
 override CFILES := $(filter %.c,$(SRCFILES))
 override NASMFILES := $(filter %.asm,$(SRCFILES))
 override FONTFILES := $(filter %.sfn,$(SRCFILES))
@@ -184,3 +185,7 @@ vnc:
 clean:
 	rm -f image.hdd
 	rm -rf bin obj
+
+.PHONY: compile-commands
+compile-commands:
+	bear -- make

@@ -1,11 +1,7 @@
 #pragma once
 
-#include "limine.h"
-#include "kernel.h"
 #include <stdint.h>
 #include <stdbool.h>
-
-extern struct bootloader_data limine_parsed_data;
 
 struct _console_config {
     void (*set_font)(uint8_t, bool);
@@ -24,7 +20,7 @@ struct _console_cursor {
 struct _console {
     // void term_putc(uint32_t ch)
     void (*putc)(uint32_t);
-    // void term_putc(const char *s)
+    // void term_puts(const char *s)
     void (*puts)(const char*);
     // void console_init(struct limine_framebuffer *fb)
     void (*init)();
@@ -41,5 +37,18 @@ struct _console {
     struct _console_config config;
     struct _console_cursor cursor;
 };
+
+struct _serial_console {
+    // void serial_putc(char ch)
+    void (*putc)(char);
+    // void serial_puts(const char *s)
+    void (*puts)(const char*);
+    // void serial_puthex(uint64_t value)
+    void (*puthex)(uint64_t);
+    // int serial_printf(const char *fmt, ...)
+    int (*printf)(const char*, ...);
+};
+
+extern const struct _serial_console SerialConsole;
 
 extern const struct _console Console;
