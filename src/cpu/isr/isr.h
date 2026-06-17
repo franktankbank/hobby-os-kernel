@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "../../kernel/macro.h"
 
 void isr_install();
 
@@ -39,4 +40,4 @@ typedef struct {
   uint64_t rsp;
   uint64_t ss;
 
-} __attribute__((packed)) registers_t;
+} PACKED registers_t;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "../../kernel/macro.h"
 
 #define GDT_NULL 0x00
 #define GDT_KERNEL_CODE 0x08
@@ -35,7 +36,7 @@ typedef struct {
     uint64_t ist[7];
     uint64_t reserved2;
     uint32_t iobase;
-} __attribute__((packed)) tss_t;
+} PACKED tss_t;
 
 typedef struct {
     uint16_t limit_low;           // limit & 0xFF
@@ -44,7 +45,7 @@ typedef struct {
     uint8_t access;               // access
     uint8_t limit_high_and_flags; // ((limit >> 16) & 0xF) | (flags & 0xF0)
     uint8_t base_high;            // (base >> 24) & 0xF
-} __attribute__((packed)) gdt_entry_t;
+} PACKED gdt_entry_t;
 
 typedef struct {
     uint16_t limit_low;
@@ -55,9 +56,9 @@ typedef struct {
     uint8_t base_high;
     uint32_t base_higher;
     uint32_t zero;
-} __attribute__((packed)) tss_entry_t;
+} PACKED tss_entry_t;
 
 typedef struct {
     uint16_t size;
     gdt_entry_t *pointer;
-} __attribute__((packed)) gdt_pointer_t;
+} PACKED gdt_pointer_t;

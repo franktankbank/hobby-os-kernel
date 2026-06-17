@@ -22,8 +22,8 @@ typedef struct bootloader_data {
     // ACPI/MMIO
     uint64_t *rsdp_table_addr;
 
-    uint64_t p_lapic_base;
-    uint32_t p_ioapic_base;
+    volatile uint32_t *lapic_addr;
+    uint32_t *ioapic_addr;
 
     // framebuffer
     struct limine_framebuffer *framebuffer;
@@ -33,7 +33,7 @@ typedef struct bootloader_data {
     LIMINE_PTR(struct limine_mp_info **) cpus;
     bool smp_enabled;
 
-    uint64_t boot_time; // ms since boot
+    int64_t timestamp_at_boot;
 
     // scheduler
     bool scheduler_enabled;

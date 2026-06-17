@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
+
+#define IS_BIT_SET(n, pos) ((n >> pos) & 1)
 
 // GCC and Clang reserve the right to generate calls to the following
 // 4 functions even if they are not directly called.
@@ -18,14 +18,16 @@ void *memmove(void *dest, const void *src, size_t n);
 
 int memcmp(const void *s1, const void *s2, size_t n);
 
-int string_length(char s[]);
+size_t strnlen(const char *s, size_t maxlen);
+
+size_t strlen(const char *s);
 
 void reverse(char s[]);
 
 void int_to_string(int n, char str[]);
 
-void append(char s[], char n);
-
-bool backspace(char s[]);
-
 void hcf(void);
+
+int strncmp(const char *s1, const char *s2, size_t n);
+
+char *strcat(char *dest, const char *src);

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <uacpi/uacpi.h>
 #include <uacpi/namespace.h>
 #include <uacpi/utilities.h>

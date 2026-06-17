@@ -3,8 +3,6 @@
 #include "../../kernel/util.h"
 #include "../idt/idt.h"
 
-extern struct limine_hhdm_request *hhdm_request;
-
 isrHandler isr_handlers[IDT_MAX_DESCRIPTORS];
 
 static const char *const exceptions[] = {"Divide by zero error",
@@ -41,26 +39,26 @@ static const char *const exceptions[] = {"Divide by zero error",
                                          ""};
 
 static void isr_exceptions(void *ctx) {
-  registers_t *regs = ctx;
+    registers_t *regs = ctx;
 
-  Console.config.set_bg(0xCC0000);
-  Console.config.set_font(28, true);
-  Console.clear();
-  int center_row = (Console.cursor.get_rows() / 2) - 4;
-  Console.cursor.set_cursor(Console.cursor.get_current_col(), center_row - 1);
-  Console.config.set_bg(0xFFFFFF);
-  Console.config.set_fg(0xCC0000);
-  Console.centered_puts(" Panic! ");
-  Console.config.set_bg(0xCC0000);
-  Console.config.set_fg(0xFFFFFF);
-  Console.puts("\n\n");
-  Console.centered_printf("Fatal exception %#x triggered at RIP=%#x: %s", regs->interrupt, regs->rip);
-  Console.puts("\n\n");
-  Console.centered_printf("MSG=\"%s\"", exceptions[regs->interrupt]);
-  Console.putc('\n');
-  Console.centered_printf("ERR=%#x", regs->error);
-  SerialConsole.printf("Fatal exception %#x: %s with error code %#x triggered... Dumping registers:\n\nRAX=%#x\nRBX=%#x\nRCX=%#x\nRDX=%#x\nRSI=%#x\nRDI=%#x\nRSP=%#x\nRBP=%#x\nR8=%#x\nR9=%#x\nR10=%#x\nR11=%#x\nR12=%#x\nR13=%#x\nR14=%#x\nR15=%#x\nRIP=%#x\nCS=%#x\nDS=%#x\nSS=%#x\nRFLAGS=%#x\n", regs->interrupt, exceptions[regs->interrupt], regs->error, regs->rax, regs->rbx, regs->rcx, regs->rdx, regs->rsi, regs->rdi, regs->rsp, regs->rbp, regs->r8, regs->r9, regs->r10, regs->r11, regs->r12, regs->r13, regs->r14, regs->r15, regs->rip, regs->cs, regs->ds, regs->ss, regs->rflags);
-  hcf();
+    Console.config.set_bg(0xCC0000);
+    Console.config.set_font(28, true);
+    Console.clear();
+    int center_row = (Console.cursor.get_rows() / 2) - 4;
+    Console.cursor.set_cursor(Console.cursor.get_current_col(), center_row - 1);
+    Console.config.set_bg(0xFFFFFF);
+    Console.config.set_fg(0xCC0000);
+    Console.centered_puts(" Panic! ");
+    Console.config.set_bg(0xCC0000);
+    Console.config.set_fg(0xFFFFFF);
+    Console.puts("\n\n");
+    Console.centered_printf("Fatal exception %#x triggered at RIP=%#x", regs->interrupt, regs->rip);
+    Console.puts("\n\n");
+    Console.centered_printf("MSG=\"%s\"", exceptions[regs->interrupt]);
+    Console.putc('\n');
+    Console.centered_printf("ERR=%#x", regs->error);
+    SerialConsole.printf("Fatal exception %#x: %s with error code %#x triggered... Dumping registers:\n\nRAX=%#x\nRBX=%#x\nRCX=%#x\nRDX=%#x\nRSI=%#x\nRDI=%#x\nRSP=%#x\nRBP=%#x\nR8=%#x\nR9=%#x\nR10=%#x\nR11=%#x\nR12=%#x\nR13=%#x\nR14=%#x\nR15=%#x\nRIP=%#x\nCS=%#x\nDS=%#x\nSS=%#x\nRFLAGS=%#x\n", regs->interrupt, exceptions[regs->interrupt], regs->error, regs->rax, regs->rbx, regs->rcx, regs->rdx, regs->rsi, regs->rdi, regs->rsp, regs->rbp, regs->r8, regs->r9, regs->r10, regs->r11, regs->r12, regs->r13, regs->r14, regs->r15, regs->rip, regs->cs, regs->ds, regs->ss, regs->rflags);
+    hcf();
 }
 
 void isr_install() {

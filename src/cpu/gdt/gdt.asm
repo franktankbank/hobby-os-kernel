@@ -5,10 +5,10 @@ section .text align=16
 global _load_gdt
 _load_gdt:
     lgdt [rdi]
-    push ax
+    ; push ax
     mov ax, 0x28
     ltr ax
-    pop ax
+    ; pop ax
     ret
 
 ; void _reload_segments(uint64_t cs, uint64_t ds)
