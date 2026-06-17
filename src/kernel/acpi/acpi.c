@@ -1,11 +1,9 @@
 #include <stdint.h>
 
 #include <uacpi/uacpi.h>
+#include <uacpi/utilities.h>
 #include <uacpi/event.h>
-#include <uacpi/kernel_api.h>
 #include "../console.h"
-#include "../pmm.h"
-#include "../limine.h"
 
 int acpi_init(void) {
     /*
@@ -15,7 +13,7 @@ int acpi_init(void) {
      */
     uacpi_status ret = uacpi_initialize(0);
     if (uacpi_unlikely_error(ret)) {
-        Console.printf("uacpi_initialize error: %s", uacpi_status_to_string(ret));
+        SerialConsole.printf("uacpi_initialize error: %s", uacpi_status_to_string(ret));
         return -19;
     }
 
@@ -25,7 +23,7 @@ int acpi_init(void) {
      */
     ret = uacpi_namespace_load();
     if (uacpi_unlikely_error(ret)) {
-        Console.printf("uacpi_namespace_load error: %s", uacpi_status_to_string(ret));
+        SerialConsole.printf("uacpi_namespace_load error: %s", uacpi_status_to_string(ret));
         return -19;
     }
 
@@ -35,9 +33,16 @@ int acpi_init(void) {
      */
     ret = uacpi_namespace_initialize();
     if (uacpi_unlikely_error(ret)) {
-        Console.printf("uacpi_namespace_initialize error: %s", uacpi_status_to_string(ret));
+        SerialConsole.printf("uacpi_namespace_initialize error: %s", uacpi_status_to_string(ret));
         return -19;
     }
+
+     /*
+     * Tell the firmware the interrupt model we're planning to use.
+     * (Use UACPI_INTERRUPT_MODEL_PIC if you're planning to use PIC, or any
+     *  other value depending on the architecture).
+     */
+    uacpi_set_interrupt_model(UACPI_INTERRUPT_MODEL_IOAPIC);
 
     /*
      * Tell uACPI that we have marked all GPEs we wanted for wake (even though we haven't
@@ -48,7 +53,7 @@ int acpi_init(void) {
      */
     ret = uacpi_finalize_gpe_initialization();
     if (uacpi_unlikely_error(ret)) {
-        Console.printf("uACPI GPE initialization error: %s", uacpi_status_to_string(ret));
+        SerialConsole.printf("uACPI GPE initialization error: %s", uacpi_status_to_string(ret));
         return -19;
     }
 
@@ -58,14 +63,4 @@ int acpi_init(void) {
      * enumeration and device discovery so you can bind drivers to ACPI objects.
      */
     return 0;
-}
-
-__attribute__((used, section(".limine_requests"))) static volatile struct limine_rsdp_request rsdp_request = {
-    .id = LIMINE_RSDP_REQUEST_ID,
-    .revision = 0
-};
-
-uacpi_status uacpi_kernel_get_rsdp(uacpi_phys_addr *rsdp_out) {
-    *rsdp_out = (uintptr_t)FROM_HHDM(rsdp_request.response->address);
-    return UACPI_STATUS_OK;
 }

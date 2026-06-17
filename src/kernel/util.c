@@ -1,4 +1,5 @@
 #include "util.h"
+#include <stdint.h>
 
 // GCC and Clang reserve the right to generate calls to the following
 // 4 functions even if they are not directly called.
@@ -57,22 +58,51 @@ int memcmp(const void *s1, const void *s2, size_t n) {
   return 0;
 }
 
-int string_length(char s[]) {
-  int i = 0;
-  while (s[i] != '\0')
-    ++i;
-  return i;
+// Get length of string
+size_t strnlen(const char *s, size_t maxlen) {
+    size_t i;
+    for (i = 0; i < maxlen && s[i] != '\0'; ++i)
+        continue;
+    return i;
+}
+
+size_t strlen(const char *s) {
+    const char *t = s;
+    while (*t) t++;
+    return t - s;
+}
+
+char *strcat(char *dest, const char *src) {
+    char *start = dest;
+
+    // Move dest pointer to the end of the string
+    while (*dest != '\0') {
+        dest++;
+    }
+
+    // Append src characters
+    while (*src != '\0') {
+        *dest = *src;
+        dest++;
+        src++;
+    }
+
+    // Add null terminator
+    *dest = '\0';
+
+    return start;
 }
 
 void reverse(char s[]) {
   int c, i, j;
-  for (i = 0, j = string_length(s) - 1; i < j; i++, j--) {
+  for (i = 0, j = strlen(s) - 1; i < j; i++, j--) {
     c = s[i];
     s[i] = s[j];
     s[j] = c;
   }
 }
 
+// Convert int to string
 void int_to_string(int n, char str[]) {
   int i, sign;
   if ((sign = n) < 0)
@@ -89,31 +119,19 @@ void int_to_string(int n, char str[]) {
   reverse(str);
 }
 
-void append(char s[], char n) {
-  int len = string_length(s);
-  s[len] = n;
-  s[len + 1] = '\0';
-}
-
-bool backspace(char s[]) {
-  int len = string_length(s);
-  if (len > 0) {
-    s[len - 1] = '\0';
-    return true;
-  } else {
-    return false;
-  }
-}
-
-/* K&R
- * Returns <0 if s1<s2, 0 if s1==s2, >0 if s1>s2 */
-int compare_string(char s1[], char s2[]) {
-  int i;
-  for (i = 0; s1[i] == s2[i]; i++) {
-    if (s1[i] == '\0')
-      return 0;
-  }
-  return s1[i] - s2[i];
+int strncmp(const char *s1, const char *s2, size_t n) {
+    unsigned char u1, u2;
+    while (n-- > 0) {
+        u1 = (unsigned char) *s1++;
+        u2 = (unsigned char) *s2++;
+        if (u1 != u2) {
+            return u1 - u2;
+        }
+        if (u1 == '\0') {
+            return 0;
+        }
+    }
+    return 0;
 }
 
 // Halt and catch fire function.

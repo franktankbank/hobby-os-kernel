@@ -1,10 +1,10 @@
-#ifndef MACRO_H
-#define MACRO_H 1
+#pragma once
 
-#define SECTION(name) __attribute__((section(name)))
-#define USED          __attribute__((used))
-#define PACKED        __attribute__((packed))
-#define ALIGNED(n)    __attribute__((aligned(n)))
+#define SECTION(name)       __attribute__((section(name)))
+#define USED                __attribute__((used))
+#define USED_SECTION(name)  __attribute__((used, section(name)))
+#define PACKED              __attribute__((packed))
+#define ALIGNED(n)          __attribute__((aligned(n)))
 
 #define stringify(sumthin) #sumthin
 
@@ -21,5 +21,3 @@
 #define UNUSED(x) ((void)(x))
 
 #define ABS(x) ((x) >= 0 ? (x) : -(x))
-
-#endif // MACRO_H

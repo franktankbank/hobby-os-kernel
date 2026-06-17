@@ -7,7 +7,7 @@ gdt_pointer_t gdtr;
 struct {
     gdt_entry_t gdt_entries[5];
     tss_entry_t tss_entry;
-} __attribute__((packed)) gdt;
+} PACKED gdt;
 tss_t tss = {0};
 
 #define KERNEL_STACK_SIZE 4096 * 8
@@ -25,7 +25,7 @@ void gdt_install() {
 
     tss.rsp0 = (uint64_t)(kernel_stack + KERNEL_STACK_SIZE);
 
-    gdt.tss_entry.limit_low   = sizeof(tss_t);
+    gdt.tss_entry.limit_low   = sizeof(tss_t) - 1;
     gdt.tss_entry.base_low    = (uint16_t)((uint64_t)&tss & 0xffff);
     gdt.tss_entry.base_middle = (uint8_t)(((uint64_t)&tss >> 16) & 0xff);
     gdt.tss_entry.access      = 0x89;
