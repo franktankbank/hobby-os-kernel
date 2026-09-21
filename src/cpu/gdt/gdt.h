@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "../../types/int.h"
 #include "../../kernel/macro.h"
 
 #define GDT_NULL 0x00
@@ -28,37 +28,37 @@
 void gdt_install();
 
 typedef struct {
-    uint32_t reserved0;
-    uint64_t rsp0;
-    uint64_t rsp1;
-    uint64_t rsp2;
-    uint64_t reserved1;
-    uint64_t ist[7];
-    uint64_t reserved2;
-    uint32_t iobase;
+    u32 reserved0;
+    u64 rsp0;
+    u64 rsp1;
+    u64 rsp2;
+    u64 reserved1;
+    u64 ist[7];
+    u64 reserved2;
+    u32 iobase;
 } PACKED tss_t;
 
 typedef struct {
-    uint16_t limit_low;           // limit & 0xFF
-    uint16_t base_low;            // base & 0xFF
-    uint8_t base_middle;          // (base >> 16) & 0xFF
-    uint8_t access;               // access
-    uint8_t limit_high_and_flags; // ((limit >> 16) & 0xF) | (flags & 0xF0)
-    uint8_t base_high;            // (base >> 24) & 0xF
+    u16 limit_low;           // limit & 0xFF
+    u16 base_low;            // base & 0xFF
+    u8 base_middle;          // (base >> 16) & 0xFF
+    u8 access;               // access
+    u8 limit_high_and_flags; // ((limit >> 16) & 0xF) | (flags & 0xF0)
+    u8 base_high;            // (base >> 24) & 0xF
 } PACKED gdt_entry_t;
 
 typedef struct {
-    uint16_t limit_low;
-    uint16_t base_low;
-    uint8_t base_middle;
-    uint8_t access;
-    uint8_t limit_high_and_flags;
-    uint8_t base_high;
-    uint32_t base_higher;
-    uint32_t zero;
+    u16 limit_low;
+    u16 base_low;
+    u8 base_middle;
+    u8 access;
+    u8 limit_high_and_flags;
+    u8 base_high;
+    u32 base_higher;
+    u32 zero;
 } PACKED tss_entry_t;
 
 typedef struct {
-    uint16_t size;
+    u16 size;
     gdt_entry_t *pointer;
 } PACKED gdt_pointer_t;

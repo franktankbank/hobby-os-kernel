@@ -1,12 +1,14 @@
 #include "../cpu/isr/isr.h"
 #include "../cpu/idt/idt.h"
 #include "../cpu/gdt/gdt.h"
+#include "../cpu/pic/pic.h"
 #include "kernel.h"
-// #include "../drivers/keyboard.h"
+#include "../drivers/keyboard.h"
 #include "../drivers/serial.h"
 #include "console.h"
-#include "pmm.h"
+#include "paging.h"
 #include "limine.h"
+#include "pmm.h"
 #include "util.h"
 #include "macro.h"
 #include "acpi/table.h"
@@ -17,7 +19,7 @@
 // base revision described by the Limine boot protocol specification.
 // See specification for further info.
 
-USED_SECTION(".limine_requests") static volatile uint64_t
+USED_SECTION(".limine_requests") static volatile u64
     limine_base_revision[] = LIMINE_BASE_REVISION(5);
 
 // The Limine requests can be placed anywhere, but it is important that
@@ -46,10 +48,10 @@ USED_SECTION(".limine_requests") static volatile struct limine_memmap_request me
 // Finally, define the start and end markers for the Limine requests.
 // These can also be moved anywhere, to any .c file, as seen fit.
 
-USED_SECTION(".limine_requests_start") static volatile uint64_t
+USED_SECTION(".limine_requests_start") static volatile u64
     limine_requests_start_marker[] = LIMINE_REQUESTS_START_MARKER;
 
-USED_SECTION(".limine_requests_end") static volatile uint64_t
+USED_SECTION(".limine_requests_end") static volatile u64
     limine_requests_end_marker[] = LIMINE_REQUESTS_END_MARKER;
 
 struct bootloader_data limine_parsed_data;
@@ -63,6 +65,7 @@ struct bootloader_data *get_bootloader_data() {
 // linker script accordingly.
 void kmain(void) {
     serial_init();
+    SerialConsole.printf("\033[2J\033[H");
     SerialConsole.printf("A\n");
 
     // Ensure the bootloader actually understands our base revision (see spec).
@@ -107,82 +110,36 @@ void kmain(void) {
 
     Console.clear();
 
+    u64 entry_count = memmap_request.response->entry_count;
+
+    limine_parsed_data.memmap_entries = memmap_request.response->entries;
+    limine_parsed_data.memmap_entry_count = entry_count;
+
+    limine_parsed_data.ioapic_phys = get_ioapic_phys();
+    limine_parsed_data.lapic_phys = get_lapic_phys();
+
+    pmm_init();
+
+    setup_paging();
+
     gdt_install();
 
     load_idt();
 
-    // serial_init();
-
     isr_install();
 
-  // lapic_init_x2apic();
+    pic_disable();
+    SerialConsole.puts("Disabled PIC\n");
+    set_irqs();
+    SerialConsole.puts("Set IRQs\n");
+    init_keyboard();
+    SerialConsole.puts("Initialized keyboard\n");
+    asm volatile("sti");
+    SerialConsole.puts("Enabled Interrupts\n");
 
-  // ioapic_init(hhdm_offset);
+    // Console.puts("Hello, World!\nGoodbye, World!");
 
-  // ioapic_set_redirect(mp_request.response->bsp_lapic_id, 1,
-  //                     33); // keyboard → IRQ1 → vector 33
-
-  // asm volatile("sti");
-
-  // init_keyboard();
-//   acpi_init();
-
-    // limine_parsed_data.lapic_addr = make_hhdm(get_lapic_addr());
-
-    uint64_t entry_count = memmap_request.response->entry_count;
-
-    SerialConsole.printf("Memmap Entries: %lu\n", entry_count);
-
-    for (uint64_t i = 0; i < entry_count; i++) {
-        struct limine_memmap_entry *entry = memmap_request.response->entries[i];
-        char* type = "";
-        switch (entry->type) {
-            case 0:
-                type = "LIMINE_MEMMAP_USABLE";
-                break;
-            case 1:
-                type = "LIMINE_MEMMAP_RESERVED";
-                break;
-            case 2:
-                type = "LIMINE_MEMMAP_ACPI_RECLAIMABLE";
-                break;
-            case 3:
-                type = "LIMINE_MEMMAP_ACPI_NVS";
-                break;
-            case 4:
-                type = "LIMINE_MEMMAP_BAD_MEMORY";
-                break;
-            case 5:
-                type = "LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE";
-                break;
-            case 6:
-                type = "LIMINE_MEMMAP_EXECUTABLE_AND_MODULES";
-                break;
-            case 7:
-                type = "LIMINE_MEMMAP_FRAMEBUFFER";
-                break;
-            case 8:
-                type = "LIMINE_MEMMAP_RESERVED_MAPPED";
-                break;
-        }
-        SerialConsole.printf("Entry %lu:\nBase: %lu\nLength: %lu\nType: %s\n\n", i, entry->base, entry->length, type);
-    }
-
-    // SerialConsole.printf("id = %#x", limine_parsed_data.lapic_addr[0x20 / 4]);
-
-    uint64_t phys = get_lapic_addr();
-    // void *virt = make_hhdm(phys);
-
-    // SerialConsole.printf("lapic phys=%#lx\n", phys);
-    // SerialConsole.printf("lapic virt=%p\n", virt);
-
-    void *lapic = mmio_map(phys, 0x1000);
-
-    // hcf();
-
-    Console.puts("Hello, World!\nGoodbye, World!");
-
-    __asm__ volatile("int3");
+    // __asm__ volatile("int3");
 
     // We're done, just hang...
     hcf();

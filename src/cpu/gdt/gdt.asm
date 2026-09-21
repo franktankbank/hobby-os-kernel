@@ -11,7 +11,7 @@ _load_gdt:
     ; pop ax
     ret
 
-; void _reload_segments(uint64_t cs, uint64_t ds)
+; void _reload_segments(u64 cs, u64 ds)
 global _reload_segments
 _reload_segments:
     push rdi        ; cs (rdi & 0xFF)

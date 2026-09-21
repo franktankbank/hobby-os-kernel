@@ -2,7 +2,7 @@
 
 #define IDT_MAX_DESCRIPTORS 256
 
-#include <stdint.h>
+#include "../../types/int.h"
 
 extern void *isr_stub_table[];
 
@@ -22,7 +22,7 @@ typedef enum {
 
 } IDT_FLAGS;
 
-void set_idt_gate(uint8_t index, void *base, uint16_t selector, uint8_t flags);
+void set_idt_gate(u8 index, void *base, u16 selector, u8 flags);
 
 void idt_gate_enable(int interrupt);
 void idt_gate_disable(int interrupt);

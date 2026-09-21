@@ -1,5 +1,3 @@
-#include <stdint.h>
-
 #include <uacpi/uacpi.h>
 #include <uacpi/utilities.h>
 #include <uacpi/event.h>

@@ -1,15 +1,15 @@
 // #pragma once
 
-// #include <stdint.h>
+// #include "../../types/int.h"
 // #include <stdbool.h>
 
 // static
 
 // struct PMTimer {
-//     uint64_t    Address64; // Address of X_PMTimerBlock Generic Address Structure
-//     uint32_t    Address32; // Address of PMTimerBlock
-//     uint8_t     Bitness; // 24-bit or 32-bit
-//     uint8_t     AddressSpace; // Only needed if Address64 is not 0
+//     u64    Address64; // Address of X_PMTimerBlock Generic Address Structure
+//     u32    Address32; // Address of PMTimerBlock
+//     u8     Bitness; // 24-bit or 32-bit
+//     u8     AddressSpace; // Only needed if Address64 is not 0
 //     bool        Available;
 // };
 

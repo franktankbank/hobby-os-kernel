@@ -4,20 +4,20 @@
 #include "../../kernel/macro.h"
 
 typedef struct {
-    uint16_t base_low;  // The lower 16 bits of the ISR's address
-    uint16_t kernel_cs; // The GDT segment selector that the CPU will load into
+    u16 base_low;  // The lower 16 bits of the ISR's address
+    u16 kernel_cs; // The GDT segment selector that the CPU will load into
                         // CS before calling the ISR
-    uint8_t ist; // The IST in the TSS that the CPU will load into RSP; set to
+    u8 ist; // The IST in the TSS that the CPU will load into RSP; set to
                  // zero for now
-    uint8_t attributes; // Type and attributes; see the IDT page
-    uint16_t base_mid;  // The higher 16 bits of the lower 32 bits of the ISR's
+    u8 attributes; // Type and attributes; see the IDT page
+    u16 base_mid;  // The higher 16 bits of the lower 32 bits of the ISR's
                         // address
-    uint32_t base_high; // The higher 32 bits of the ISR's address
-    uint32_t reserved;  // Set to zero
+    u32 base_high; // The higher 32 bits of the ISR's address
+    u32 reserved;  // Set to zero
 } PACKED idt_entry_t;
 
 typedef struct {
-    uint16_t limit;
+    u16 limit;
     idt_entry_t *base;
 } PACKED idtr_t;
 
@@ -29,9 +29,9 @@ static bool vectors[IDT_MAX_DESCRIPTORS];
 
 void load_idt() {
     idtr.base = (idt_entry_t *) &idt_entries[0];
-    idtr.limit = (uint16_t)sizeof(idt_entry_t) * IDT_MAX_DESCRIPTORS - 1;
+    idtr.limit = (u16)sizeof(idt_entry_t) * IDT_MAX_DESCRIPTORS - 1;
 
-    for (uint16_t vector = 0; vector < IDT_MAX_DESCRIPTORS; vector++) {
+    for (u16 vector = 0; vector < IDT_MAX_DESCRIPTORS; vector++) {
         set_idt_gate(vector, isr_stub_table[vector], GDT_KERNEL_CODE, 0x8E);
         vectors[vector] = true;
     }
@@ -39,13 +39,13 @@ void load_idt() {
     // __asm__ volatile("sti");                   // set the interrupt flag
 }
 
-void set_idt_gate(uint8_t index, void *base, uint16_t selector, uint8_t flags) {
-    idt_entries[index].base_low   = (uint64_t)base & 0xFFFF;
+void set_idt_gate(u8 index, void *base, u16 selector, u8 flags) {
+    idt_entries[index].base_low   = (u64)base & 0xFFFF;
     idt_entries[index].kernel_cs  = selector;
     idt_entries[index].ist        = 0;
     idt_entries[index].attributes = flags;
-    idt_entries[index].base_mid   = ((uint64_t)base >> 16) & 0xFFFF;
-    idt_entries[index].base_high  = ((uint64_t)base >> 32) & 0xFFFFFFFF;
+    idt_entries[index].base_mid   = ((u64)base >> 16) & 0xFFFF;
+    idt_entries[index].base_high  = ((u64)base >> 32) & 0xFFFFFFFF;
     idt_entries[index].reserved   = 0;
 }
 

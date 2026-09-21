@@ -4,7 +4,7 @@
 #define NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS 0
 #define NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS 0
+#define NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_SMALL_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS 0
 #define NANOPRINTF_USE_WRITEBACK_FORMAT_SPECIFIERS 0
@@ -52,7 +52,7 @@ void console_init() {
   term_rows = limine_parsed_data.framebuffer->height / cell_h;
 }
 
-void term_putc(uint32_t ch) {
+void term_putc(u32 ch) {
   if (ch == '\n') {
     cursor.col = 0;
     cursor.row++;
@@ -85,10 +85,10 @@ void serial_putc(char ch) {
 }
 
 void term_clear(void) {
-  for (uint32_t y = 0; y < (uint32_t)ssfn_dst.h; y++) {
-    uint32_t *row = (uint32_t *)((uint8_t *)ssfn_dst.ptr + y * ssfn_dst.p);
+  for (u32 y = 0; y < (u32)ssfn_dst.h; y++) {
+    u32 *row = (u32 *)((u8 *)ssfn_dst.ptr + y * ssfn_dst.p);
 
-    for (uint32_t x = 0; x < (uint32_t)ssfn_dst.w; x++) {
+    for (u32 x = 0; x < (u32)ssfn_dst.w; x++) {
       row[x] = ssfn_dst.bg;
     }
   }
@@ -111,7 +111,7 @@ void serial_puts(const char *s) {
   }
 }
 
-void term_puthex(uint64_t value) {
+void term_puthex(u64 value) {
   char hex[] = "0123456789ABCDEF";
   char buffer[17];
   buffer[16] = '\0';
@@ -125,7 +125,7 @@ void term_puthex(uint64_t value) {
   term_puts(buffer);
 }
 
-void serial_puthex(uint64_t value) {
+void serial_puthex(u64 value) {
   char hex[] = "0123456789ABCDEF";
   char buffer[17];
   buffer[16] = '\0';
@@ -223,7 +223,7 @@ int term_centered_printf(const char *fmt, ...) {
   return length;
 }
 
-void config_set_font(uint8_t fontsize, bool bold) {
+void config_set_font(u8 fontsize, bool bold) {
   term_clear();
   if (bold) {
     switch (fontsize) {
@@ -377,11 +377,11 @@ void config_set_font(uint8_t fontsize, bool bold) {
 
 }
 
-void config_set_bg(uint32_t bg) {
+void config_set_bg(u32 bg) {
   ssfn_dst.bg = bg;
 }
 
-void config_set_fg(uint32_t fg) {
+void config_set_fg(u32 fg) {
   ssfn_dst.fg = fg;
 }
 

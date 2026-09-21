@@ -78,7 +78,7 @@ NPF_VISIBILITY int npf_vpprintf(npf_putc pc,
 #define NPF_IMPLEMENTATION_INCLUDED
 
 #include <limits.h>
-#include <stdint.h>
+#include "../types/int.h"
 
 // The conversion buffer must fit at least UINT64_MAX in octal format with the leading '0'.
 #ifndef NANOPRINTF_CONVERSION_BUFFER_SIZE
@@ -291,10 +291,10 @@ typedef struct npf_format_spec {
 #endif
 #if NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS == 1
   int prec;
-  uint8_t prec_opt;
+  u8 prec_opt;
 #endif
 #if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
-  uint8_t field_width_opt;
+  u8 field_width_opt;
   char left_justified;   // '-'
   char leading_zero_pad; // '0'
 #endif
@@ -303,8 +303,8 @@ typedef struct npf_format_spec {
   char alt_form;         // '#'
 #endif
   char case_adjust;      // 'a' - 'A' , or 0 (must be non-negative to work)
-  uint8_t length_modifier;
-  uint8_t conv_spec;
+  u8 length_modifier;
+  u8 conv_spec;
 } npf_format_spec_t;
 
 #if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
@@ -447,7 +447,7 @@ static int npf_parse_format_spec(char const *format, npf_format_spec_t *out_spec
     case 'X': out_spec->case_adjust = 0;
     case 'x': tmp_conv = NPF_FMT_SPEC_CONV_HEX_INT; goto finish;
     finish:
-      out_spec->conv_spec = (uint8_t)tmp_conv;
+      out_spec->conv_spec = (u8)tmp_conv;
       break;
 
 #if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1

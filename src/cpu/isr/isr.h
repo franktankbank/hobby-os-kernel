@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include "../../types/int.h"
 #include "../../kernel/macro.h"
 
 void isr_install();
@@ -10,34 +10,34 @@ typedef void (*isrHandler)(void *ctx);
 void isr_registerHandler(int interrupt, isrHandler handler);
 
 typedef struct {
-  uint64_t ds;
+  u64 ds;
 
-  uint64_t r15;
-  uint64_t r14;
-  uint64_t r13;
-  uint64_t r12;
-  uint64_t r11;
-  uint64_t r10;
-  uint64_t r9;
-  uint64_t r8;
+  u64 r15;
+  u64 r14;
+  u64 r13;
+  u64 r12;
+  u64 r11;
+  u64 r10;
+  u64 r9;
+  u64 r8;
 
-  uint64_t rbp;
+  u64 rbp;
 
-  uint64_t rdi;
-  uint64_t rsi;
+  u64 rdi;
+  u64 rsi;
 
-  uint64_t rdx;
-  uint64_t rcx;
-  uint64_t rbx;
-  uint64_t rax;
+  u64 rdx;
+  u64 rcx;
+  u64 rbx;
+  u64 rax;
 
-  uint64_t interrupt;
-  uint64_t error;
+  u64 interrupt;
+  u64 error;
 
-  uint64_t rip;
-  uint64_t cs;
-  uint64_t rflags;
-  uint64_t rsp;
-  uint64_t ss;
+  u64 rip;
+  u64 cs;
+  u64 rflags;
+  u64 rsp;
+  u64 ss;
 
 } PACKED registers_t;

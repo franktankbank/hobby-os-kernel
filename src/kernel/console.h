@@ -1,12 +1,12 @@
 #pragma once
 
-#include <stdint.h>
+#include "../types/int.h"
 #include <stdbool.h>
 
 struct _console_config {
-    void (*set_font)(uint8_t, bool);
-    void (*set_fg)(uint32_t);
-    void (*set_bg)(uint32_t);
+    void (*set_font)(u8, bool);
+    void (*set_fg)(u32);
+    void (*set_bg)(u32);
 };
 
 struct _console_cursor {
@@ -18,14 +18,14 @@ struct _console_cursor {
 };
 
 struct _console {
-    // void term_putc(uint32_t ch)
-    void (*putc)(uint32_t);
+    // void term_putc(u32 ch)
+    void (*putc)(u32);
     // void term_puts(const char *s)
     void (*puts)(const char*);
     // void console_init(struct limine_framebuffer *fb)
     void (*init)();
-    // void term_puthex(uint64_t value)
-    void (*puthex)(uint64_t);
+    // void term_puthex(u64 value)
+    void (*puthex)(u64);
     // int term_printf(const char *fmt, ...)
     int (*printf)(const char*, ...);
     // void term_clear(void)
@@ -43,8 +43,8 @@ struct _serial_console {
     void (*putc)(char);
     // void serial_puts(const char *s)
     void (*puts)(const char*);
-    // void serial_puthex(uint64_t value)
-    void (*puthex)(uint64_t);
+    // void serial_puthex(u64 value)
+    void (*puthex)(u64);
     // int serial_printf(const char *fmt, ...)
     int (*printf)(const char*, ...);
 };

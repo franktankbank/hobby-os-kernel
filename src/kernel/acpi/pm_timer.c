@@ -42,6 +42,6 @@
 //     return pm_timer;
 // }
 
-// uint64_t read_pm_timer(struct PMTimer pm_timer) {
+// u64 read_pm_timer(struct PMTimer pm_timer) {
 
 // }

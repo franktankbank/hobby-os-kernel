@@ -1,5 +1,5 @@
 #include "util.h"
-#include <stdint.h>
+#include "../types/int.h"
 
 // GCC and Clang reserve the right to generate calls to the following
 // 4 functions even if they are not directly called.
@@ -8,8 +8,8 @@
 // They CAN be moved to a different .c file.
 
 void *memcpy(void *restrict dest, const void *restrict src, size_t n) {
-  uint8_t *restrict pdest = (uint8_t *restrict)dest;
-  const uint8_t *restrict psrc = (const uint8_t *restrict)src;
+  u8 *restrict pdest = (u8 *restrict)dest;
+  const u8 *restrict psrc = (const u8 *restrict)src;
 
   for (size_t i = 0; i < n; i++) {
     pdest[i] = psrc[i];
@@ -19,18 +19,18 @@ void *memcpy(void *restrict dest, const void *restrict src, size_t n) {
 }
 
 void *memset(void *s, int c, size_t n) {
-  uint8_t *p = (uint8_t *)s;
+  u8 *p = (u8 *)s;
 
   for (size_t i = 0; i < n; i++) {
-    p[i] = (uint8_t)c;
+    p[i] = (u8)c;
   }
 
   return s;
 }
 
 void *memmove(void *dest, const void *src, size_t n) {
-  uint8_t *pdest = (uint8_t *)dest;
-  const uint8_t *psrc = (const uint8_t *)src;
+  u8 *pdest = (u8 *)dest;
+  const u8 *psrc = (const u8 *)src;
 
   if (src > dest) {
     for (size_t i = 0; i < n; i++) {
@@ -46,8 +46,8 @@ void *memmove(void *dest, const void *src, size_t n) {
 }
 
 int memcmp(const void *s1, const void *s2, size_t n) {
-  const uint8_t *p1 = (const uint8_t *)s1;
-  const uint8_t *p2 = (const uint8_t *)s2;
+  const u8 *p1 = (const u8 *)s1;
+  const u8 *p2 = (const u8 *)s2;
 
   for (size_t i = 0; i < n; i++) {
     if (p1[i] != p2[i]) {

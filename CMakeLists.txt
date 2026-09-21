@@ -14,6 +14,8 @@ set(REQUIRED_CMDS
     "minicom"
 )
 
+option(DISPLAY_USE_VNC "Use vnc for qemu display" OFF)
+
 foreach(REQUIRED_CMD ${REQUIRED_CMDS})
     string(REPLACE "-" "_" REQUIRED_CMD_SANITIZED ${REQUIRED_CMD})
     string(TOUPPER ${REQUIRED_CMD_SANITIZED} REQUIRED_CMD_UPPER)
@@ -40,11 +42,11 @@ include(cmake/sources.cmake)
 include(cmake/includes.cmake)
 include(cmake/fonts.cmake)
 
-set(CMAKE_C_FLAGS "-pipe -Wall -Wextra -std=gnu11 -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -fno-PIC -ffunction-sections -fdata-sections -m64 -march=x86-64 -mabi=sysv -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone -mcmodel=kernel -fdiagnostics-color=always" CACHE STRING "C compiler flags" FORCE)
+set(CMAKE_C_FLAGS "-pipe -Wall -Wextra -std=gnu11 -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -fno-PIC -ffunction-sections -fdata-sections -m64 -march=x86-64 -mabi=sysv -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone -mcmodel=kernel -fdiagnostics-color=always --target=x86_64-unknown-linux-gnu" CACHE STRING "C compiler flags" FORCE)
 set(CMAKE_ASM_NASM_FLAGS "-f elf64 -Wall -Xgnu" CACHE STRING "nasm assembler flags" FORCE)
 set(CMAKE_ASM_NASM_FLAGS_DEBUG "-g -F dwarf -O0" CACHE STRING "nasm assembler flags (DEBUG)" FORCE)
 set(CMAKE_ASM_NASM_FLAGS_RELEASE "-Ox" CACHE STRING "nasm assembler flags (RELEASE)" FORCE)
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,-m -Wl,elf_x86_64 -nostdlib -static -z max-page-size=0x1000 -Wl,--gc-sections -T ${CMAKE_CURRENT_SOURCE_DIR}/misc/linker.lds" CACHE STRING "linker flags" FORCE)
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,-m -Wl,elf_x86_64 -Wl,--no-pie -nostdlib -static -z max-page-size=0x1000 -Wl,--gc-sections -T ${CMAKE_CURRENT_SOURCE_DIR}/misc/linker.lds" CACHE STRING "linker flags" FORCE)
 
 foreach(FONT_FILE ${FONT_FILES})
     get_filename_component(FONT_NAME ${FONT_FILE} NAME_WE)
@@ -106,10 +108,22 @@ add_custom_target(image ALL
     VERBATIM
 )
 
-add_custom_target(start
-    COMMAND qemu-system-x86_64 --bios OVMF.fd -drive file=${CMAKE_CURRENT_BINARY_DIR}/image.hdd,format=raw -chardev pty,path=/tmp/qemu-serial,id=serial0 -chardev pty,path=/tmp/qemu-monitor,id=monitor0 -serial chardev:serial0 -monitor chardev:monitor0 -cpu Skylake-Client,+x2apic
-    VERBATIM
-)
+if(DISPLAY_USE_VNC)
+    add_custom_target(start
+        COMMAND qemu-system-x86_64 --bios OVMF.fd -drive file=${CMAKE_CURRENT_BINARY_DIR}/image.hdd,format=raw -chardev pty,path=/tmp/qemu-serial,id=serial0 -chardev pty,path=/tmp/qemu-monitor,id=monitor0 -serial chardev:serial0 -monitor chardev:monitor0 -cpu Skylake-Client,+x2apic -display vnc=0.0.0.0:0
+        VERBATIM
+    )
+
+    add_custom_target(vnc
+        COMMAND /usr/share/novnc/utils/novnc_proxy --vnc localhost:5900 --listen localhost:6081
+        VERBATIM
+    )
+else()
+    add_custom_target(start
+        COMMAND qemu-system-x86_64 --bios OVMF.fd -drive file=${CMAKE_CURRENT_BINARY_DIR}/image.hdd,format=raw -chardev pty,path=/tmp/qemu-serial,id=serial0 -chardev pty,path=/tmp/qemu-monitor,id=monitor0 -serial chardev:serial0 -monitor chardev:monitor0 -cpu Skylake-Client,+x2apic
+        VERBATIM
+    )
+endif()
 
 add_custom_target(serial
     COMMAND minicom -D /tmp/qemu-serial

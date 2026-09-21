@@ -3,6 +3,7 @@ bits 64
 global isr_common
 global isr_stub_table
 extern isr_handler
+extern LAPIC_VIRT
 
 section .text
 
@@ -69,6 +70,13 @@ isr_common:
     pop rbx
     pop rax
 
+    mov rax, [rsp + 16]
+    cmp al, 0x20
+    jb .skip_eoi
+    mov rax, [abs LAPIC_VIRT]
+    xor ecx, ecx
+    mov [rax + 0xB0], ecx
+.skip_eoi:
     add rsp, 16      ; Skip error code pushed for interrupts without errors
     iretq
 
@@ -112,3 +120,5 @@ isr_stub_table:
     dq isr_stub %+ i
     %assign i i+1
 %endrep
+
+section .data

@@ -1,7 +1,7 @@
 #include "gdt.h"
 
 extern void _load_gdt(gdt_pointer_t *descriptor);
-extern void _reload_segments(uint64_t cs, uint64_t ds);
+extern void _reload_segments(u64 cs, u64 ds);
 
 gdt_pointer_t gdtr;
 struct {
@@ -20,18 +20,18 @@ void gdt_install() {
     gdt.gdt_entries[3] = (gdt_entry_t)GDT_ENTRY(0, 0xFFFFF, 0xFA, 0xA); // user code seg
     gdt.gdt_entries[4] = (gdt_entry_t)GDT_ENTRY(0, 0xFFFFF, 0xF2, 0xC); // user data seg
 
-    gdtr.size    = (uint16_t)(sizeof(gdt) - 1);
+    gdtr.size    = (u16)(sizeof(gdt) - 1);
     gdtr.pointer = (gdt_entry_t *)&gdt;
 
-    tss.rsp0 = (uint64_t)(kernel_stack + KERNEL_STACK_SIZE);
+    tss.rsp0 = (u64)(kernel_stack + KERNEL_STACK_SIZE);
 
     gdt.tss_entry.limit_low   = sizeof(tss_t) - 1;
-    gdt.tss_entry.base_low    = (uint16_t)((uint64_t)&tss & 0xffff);
-    gdt.tss_entry.base_middle = (uint8_t)(((uint64_t)&tss >> 16) & 0xff);
+    gdt.tss_entry.base_low    = (u16)((u64)&tss & 0xffff);
+    gdt.tss_entry.base_middle = (u8)(((u64)&tss >> 16) & 0xff);
     gdt.tss_entry.access      = 0x89;
     gdt.tss_entry.limit_high_and_flags = 0;
-    gdt.tss_entry.base_high   = (uint8_t)(((uint64_t)&tss >> 24) & 0xff);
-    gdt.tss_entry.base_higher = (uint32_t)((uint64_t)&tss >> 32);
+    gdt.tss_entry.base_high   = (u8)(((u64)&tss >> 24) & 0xff);
+    gdt.tss_entry.base_higher = (u32)((u64)&tss >> 32);
     gdt.tss_entry.zero        = 0;
 
     _load_gdt(&gdtr);

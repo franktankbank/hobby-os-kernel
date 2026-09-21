@@ -1,15 +1,15 @@
 #pragma once
 
-#include <stdint.h>
+#include "../types/int.h"
 
-// unsigned char port_byte_in(uint16_t port);
+// unsigned char port_byte_in(u16 port);
 
-// void port_byte_out(uint16_t port, uint8_t data);
+// void port_byte_out(u16 port, u8 data);
 
-// unsigned short port_word_in(uint16_t port);
+// unsigned short port_word_in(u16 port);
 
-// void port_word_out(uint16_t port, uint16_t data);
+// void port_word_out(u16 port, u16 data);
 
-void outb(uint16_t port, uint8_t val);
+void outb(u16 port, u8 val);
 
-uint8_t inb(uint16_t port);
+u8 inb(u16 port);
